@@ -1,0 +1,11 @@
+{
+  "name": "bla-reports",
+  "version": "2.0.0",
+  "homepage": "https://github.com/vanilla-thunder/bla-reports",
+  "private": true,
+  "dependencies": {
+    "lumx": "*",
+    "highcharts": "https://github.com/highslide-software/highcharts-release.git",
+    "highcharts-ng": "*"
+  }
+}
