@@ -14,15 +14,29 @@
     <link rel="stylesheet" type="text/css" href="[{$oViewConf->getModuleUrl("reports","out/reports.css")}]?v=[{$smarty.now}]"/>
 </head>
 <body ng-app="reportsApp" ng-controller="reportsCtrl">
+<div class="card">
+   <div class="toolbar">
+      <div class="toolbar__left mr+++">
+         <button class="btn btn--l btn--black btn--icon" lx-ripple>
+            <i class="mdi mdi-menu"></i>
+         </button>
+      </div>
 
+      <span class="toolbar__label fs-title">[bla] reports</span>
+
+      <div class="toolbar__right">
+         <button class="btn btn--m btn--white btn--fab" lx-ripple ng-click="load('orders');"><i class="mdi mdi-refresh"></i></button>
+      </div>
+   </div>
+</div>
 hallo
 <hr/>
-<highchart id="chart1" config="chartConfig"></highchart>
+<highchart id="chart1" config="orders"></highchart>
 <hr/>
 
 
-<script type="text/javascript" src="[{$oViewConf->getModuleUrl("reports","out/angular/angular.min.js")}]"></script>
 <script type="text/javascript" src="[{$oViewConf->getModuleUrl("reports","out/jquery/dist/jquery.min.js")}]"></script>
+<script type="text/javascript" src="[{$oViewConf->getModuleUrl("reports","out/angular/angular.min.js")}]"></script>
 [{* lumx *}]
 <script type="text/javascript" src="[{$oViewConf->getModuleUrl("reports","out/velocity/velocity.min.js")}]"></script>
 <script type="text/javascript" src="[{$oViewConf->getModuleUrl("reports","out/moment/min/moment-with-locales.min.js")}]"></script>
@@ -41,11 +55,9 @@ hallo
                 
                 $http.get(url.replace("xxxxxx", fnc)).then(function (res)
                 {
-                    console.log(res);
-                    //$scope[fnc]['title'] = res.data.title;
-                    //$scope[fnc]['series'] = res.data.series;
+                    console.log(res.data);
+                    $scope[fnc] = res.data;
                     if (res.data.error) { alert(res.data.error); }
-                    console.log($scope[fnc]);
                 });
             }
             [{literal}]

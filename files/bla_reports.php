@@ -28,58 +28,97 @@
  * Author:     Rafael Dabrowski
  * Author:     Marat Bedoev
  */
- 
 class bla_reports extends oxAdminView
 {
-    protected $_sThisTemplate  = 'bla_reports.tpl';
-    
+    protected $_sThisTemplate = 'bla_reports.tpl';
+
+    public function getReport()
+    {
+        $cfg  = oxRegistry::getConfig();
+        $data = (object) json_decode(file_get_contents('php://input'), true);
+
+        $what = $data->what;
+        $over = $data->over;
+
+        // x Achse
+        switch($what)
+        {
+            
+        }
+
+        // y Achse
+        $categories = [];
+        switch($over)
+        {
+            case 'months':
+                $categories = ['Jan', 'Feb', 'Maerz', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+                break;
+            case 'years':
+                $categories = [2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016];
+                break;
+        }
+
+
+
+        $aReport = [
+            'options' => ['chart' => ['type' => 'line']],
+            'title'   => ['text' => 'Bestellungen pro Monat', 'x' => -20],
+            'xAxis'   => ['categories' => $categories],
+            'yAxis'   => [
+                'title' => ['text' => 'Bestellungen'],
+                'min'   => 0
+            ],
+            /*'plotOptions' => [
+                'line' => [
+                    'dataLabels' => [ 'enabled' => true ],
+                    'enableMouseTracking' => false
+                ]],*/
+            'series'  => []
+        ];
+        echo json_encode($aReport);
+        exit;
+    }
+
+
     public function orders()
     {
-        $oDb = oxDb::getDb();
-        
-        $aLabels = array();
-        $aSeries = ['orders'];
-        $aData = array();
-        
+        $oDb = oxDb::getDb(FETCH_MODE_NUM);
+
+        $aOrders = [
+            'options' => ['chart' => ['type' => 'line']],
+            'title'   => ['text' => 'Bestellungen pro Monat', 'x' => -20],
+            'xAxis'   => ['categories' => ['Jan', 'Feb', 'Maerz', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']],
+            'yAxis'   => [
+                'title' => ['text' => 'Bestellungen'],
+                'min'   => 0
+            ],
+            /*'plotOptions' => [
+                'line' => [
+                    'dataLabels' => [ 'enabled' => true ],
+                    'enableMouseTracking' => false
+                ]],*/
+            'series'  => []
+        ];
+
         $aValues = $oDb->getArray('SELECT YEAR(oxorderdate), MONTH(oxorderdate), COUNT(*) FROM oxorder GROUP BY YEAR(oxorderdate), MONTH(oxorderdate) ORDER BY YEAR(oxorderdate) ASC, MONTH(oxorderdate)');
-        foreach($aValues as $val)
-        {
-            $aLabels[] = $val[0]."-".$val[1];
-            $aData[] = $val[2];
+        $aData   = [];
+
+        foreach ($aValues as $val) {
+            if (!array_key_exists($val[0], $aData)) $aData[$val[0]] = array_fill(0, 12, null);
+            $aData[$val[0]][$val[1] - 1] = intval($val[2]);
         }
-        
+
+        foreach ($aData AS $year => $data) {
+            $aOrders['series'][] = ['name' => $year, 'data' => $data];
+        }
         //$aOrders = ['series' => $aSeries, 'labels' => $aLabels, 'values' => $aData];
-        echo json_encode($aValues);
+        echo json_encode($aOrders);
         exit;
     }
-    
+
     public function paymethods()
     {
-        
-    }
-    
-    public function run()
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $code = $data['code'];
-        
-        $cfg = oxRegistry::getConfig();
-        $me = $user = $cfg->getUser();
-        $session = $user->getSession();
-        $order = array_shift( $user->getOrders( 1 )->getArray() );
-        $basket = $user->getSession()->getBasket();
-        $basket->load();
-        $basket->setPayment("oxidpayadvance");
-        $basket->calculateBasket();
 
-        $fnc = function ( $code ) use ( $cfg, $me, $session, $order, $basket )
-        {
-            return eval( $code );
-        };
-
-        ob_start();
-        echo json_encode(['error' => $fnc( $code ), 'output' => ob_get_clean()]);
-        exit;
     }
 
 }
