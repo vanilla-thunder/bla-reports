@@ -31,6 +31,11 @@
 class bla_reports extends oxAdminView
 {
     protected $_sThisTemplate = 'bla_reports.tpl';
+    
+    // http://www.highcharts.com/demo
+    // http://api.highcharts.com/highcharts
+    // https://github.com/pablojim/highcharts-ng
+    
 
     public function getReport()
     {
