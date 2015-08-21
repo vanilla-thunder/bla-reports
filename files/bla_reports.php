@@ -48,7 +48,7 @@ class bla_reports extends oxAdminView
         // x Achse
         switch($what)
         {
-            
+
         }
 
         // y Achse
